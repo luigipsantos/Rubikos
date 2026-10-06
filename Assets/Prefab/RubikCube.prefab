@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3989421356809645770}
   - component: {fileID: 8956672734388530469}
+  - component: {fileID: 1850821662748772851}
   m_Layer: 0
   m_Name: RubikCube
   m_TagString: Untagged
@@ -71,6 +72,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rubikos.View.CubeBuilder
   cubiePrefab: {fileID: 8277581250515252201, guid: 378d00b9c18c94c468d9fc08254b652d, type: 3}
+--- !u!114 &1850821662748772851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2973317248518722876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3d15c06126261445945ca50e6ca478b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.View.CubeView
 --- !u!1001 &111536793444889961
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -81,6 +81,11 @@ namespace Rubikos.Core
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Which color sits at this position, facing this direction? Used to verify the 3D view
+        /// </summary>
+        public Face ColorAt(Int3 position, Int3 normal) => Find(position, normal).Color;
+
         private Sticker Find(Int3 position, Int3 normal)
         {
             foreach (Sticker s in stickers)
