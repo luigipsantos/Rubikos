@@ -1011,7 +1011,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Controls.CameraOrbit
   target: {x: 0, y: 0, z: 0}
   rotateSpeed: 0.25
-  zoomSpeed: 0.01
+  zoomSpeed: 0.1
   distanceRange: {x: 5, y: 20}
 --- !u!1 &333260900
 GameObject:
@@ -1344,7 +1344,33 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "     <b>HOW TO PLAY</b>\r\n     Mouse: drag on a face to turn that layer. Click a piece to select a layer, click it again to switch between row, column and slice.\r\n     Right mouse drag: orbit the camera. Mouse wheel: zoom.\r\n     Keys U D L R F B: turn a face (hold Shift for the opposite direction). M E S: turn the middle layers.\r\n     Keys 1 2 3: select column, row or slice. Up/Down: pick the layer. Left/Right: turn it. Esc: clear. Backspace: undo.\r\n\r\n     <b>LEARNING</b>\r\n     H: hints (a green arrow shows the next move). T: training mode (only correct moves are accepted).\r\n     N: do the next hint. P: play all hints.\r\n\r\n     <b>TIMER</b>\r\n     Click Scramble: the clock starts with your first move. Solving with hints does not count as a record.\r\n     The first time the game starts, the hint engine needs about a minute to prepare. You can play meanwhile.\r\n     I: show or hide this help."
+  m_text: '<b><color=#4CFF7A>HOW TO PLAY</color></b>
+
+    Mouse: drag on a face to turn that layer. Click a piece to select a layer, click it again to switch between row, column and slice.
+
+    Right mouse drag: orbit the camera. Mouse wheel: zoom.
+
+    Keys U D L R F B: turn a face (hold Shift for the opposite direction). M E S: turn the middle layers.
+
+    Keys 1 2 3: select column, row or slice. Up/Down: pick the layer. Left/Right: turn it. Esc: clear. Backspace: undo.
+
+    
+
+    <b><color=#4CFF7A>LEARNING</color></b>
+
+    H: hints (a green arrow shows the next move). T: training mode (only correct moves are accepted).
+
+    N: do the next hint. P: play all hints.
+
+    
+
+    <b><color=#4CFF7A>TIMER</color></b>
+
+    Click Scramble: the clock starts with your first move. Solving with hints does not count as a record.
+
+    The first time the game starts, the hint engine needs about a minute to prepare. You can play meanwhile.
+
+    I: show or hide this help.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3062,7 +3088,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.84313726}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.92156863}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4146,6 +4172,8 @@ GameObject:
   - component: {fileID: 1378914582}
   - component: {fileID: 1378914584}
   - component: {fileID: 1378914583}
+  - component: {fileID: 1378914586}
+  - component: {fileID: 1378914585}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -4203,12 +4231,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
   m_Padding:
-    m_Left: 20
-    m_Right: 20
-    m_Top: 20
-    m_Bottom: 20
+    m_Left: 40
+    m_Right: 40
+    m_Top: 40
+    m_Bottom: 40
   m_ChildAlignment: 1
-  m_Spacing: 24
+  m_Spacing: 16
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -4216,6 +4244,44 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1378914585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1378914581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.08627451, g: 0.105882354, b: 0.14117648, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1378914586
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1378914581}
+  m_CullTransparentMesh: 1
 --- !u!1 &1399920011
 GameObject:
   m_ObjectHideFlags: 0
@@ -4661,7 +4727,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "     <b>CREDITS</b>\r\n     Two-phase algorithm by Herbert Kociemba (http://kociemba.org), C# port by Megalomatt.\r\n     Sounds are generated by the game. Made with Unity."
+  m_text: '<b><color=#4CFF7A>CREDITS</color></b>
+
+    Two-phase algorithm by Herbert Kociemba (http://kociemba.org), C# port by Megalomatt.
+
+    Sounds are generated by the game. Made with Unity.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5735,7 +5805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Game.GameController
   cubeView: {fileID: 3758306780273798738}
   moveQueue: {fileID: 2122090518}
-  scrambleLength: 20
+  scrambleLength: 10
   scrambleSpeed: 4
 --- !u!114 &2122090518
 MonoBehaviour:
