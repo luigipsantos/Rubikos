@@ -17,6 +17,8 @@ namespace Rubikos.Game
 
         public CubeState State { get; } = new CubeState();
 
+        public bool IsBusy => moveQueue.IsBusy;
+
         /// <summary>
         /// Raised the moment a move is accepted (the hint system and UI will listen).
         /// </summary>

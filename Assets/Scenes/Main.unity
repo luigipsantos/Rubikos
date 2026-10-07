@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -256,6 +257,22 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99439ea6e8a582941893a0769774c88c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Controls.CameraOrbit
+  target: {x: 0, y: 0, z: 0}
+  rotateSpeed: 0.25
+  zoomSpeed: 0.01
+  distanceRange: {x: 5, y: 20}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -394,7 +411,9 @@ GameObject:
   - component: {fileID: 2122090515}
   - component: {fileID: 2122090518}
   - component: {fileID: 2122090517}
-  - component: {fileID: 2122090516}
+  - component: {fileID: 2122090520}
+  - component: {fileID: 2122090519}
+  - component: {fileID: 2122090521}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -417,19 +436,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2122090516
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2122090514}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56be5d84df606a04db8f2cddef11fd65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Game.TemporaryDebugInput
-  game: {fileID: 2122090517}
 --- !u!114 &2122090517
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,6 +464,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Rubikos.View.MoveQueue
   cubeView: {fileID: 3758306780273798738}
   settings: {fileID: 11400000, guid: f2152699b41b14e4d8abf5ed0b603010, type: 2}
+--- !u!114 &2122090519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122090514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 746ed6b396d0bf2479826d11eaa820c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Controls.KeyboardController
+  game: {fileID: 2122090517}
+  selector: {fileID: 2122090520}
+--- !u!114 &2122090520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122090514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ff1da98eb1d88f4793ebc148460428b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Controls.LayerSelector
+  highlightPrefab: {fileID: 8277805491360845060, guid: bcc89c7f172444f42b7131727c65e7b5, type: 3}
+--- !u!114 &2122090521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122090514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe1c361fe49793441b610851a68a7b3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.Controls.MouseDragController
+  game: {fileID: 2122090517}
+  selector: {fileID: 2122090520}
+  cam: {fileID: 330585545}
+  dragThresholdPixels: 15
 --- !u!1001 &3758306780273798737
 PrefabInstance:
   m_ObjectHideFlags: 0
