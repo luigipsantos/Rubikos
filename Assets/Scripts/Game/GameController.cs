@@ -31,6 +31,9 @@ namespace Rubikos.Game
         public SolverStatus SolverStatus => solver.Status;
         public string SolverMessage => solver.StatusMessage;
 
+        /// <summary>In training mode only the suggested move is accepted.</summary>
+        public bool TrainingMode { get; private set; }
+
         public bool IsBusy => moveQueue.IsBusy;
         public int MoveCount => history.Count;
         public bool CanUndo => history.Count > 0;
@@ -38,7 +41,10 @@ namespace Rubikos.Game
         /// <summary>Raised whenever the model applies a move (player moves, undo and scramble alike).</summary>
         public event Action<Move> MoveSubmitted;
 
-        /// <summary>Raised when something the UI shows may have changed.</summary>
+        /// <summary>Raised when training mode refuses a move.</summary>
+        public event Action<Move> MoveRejected;
+
+        /// <summary>Raised when something the UI shows may have changed (including hint changes).</summary>
         public event Action Changed;
 
         private void Awake()
@@ -49,6 +55,7 @@ namespace Rubikos.Game
 
             solver = new KociembaSolver(tableFolder);
             Hints = new HintService(solver);
+            Hints.Changed += OnHintsChanged; // forward, so UI scripts only need to listen to our Changed
         }
 
         private void Start()
@@ -61,12 +68,21 @@ namespace Rubikos.Game
 
         private void OnDestroy()
         {
-            Hints?.Deactivate(); // cancels any solve still running
+            if (Hints == null) return;
+            Hints.Changed -= OnHintsChanged; // unsubscribe first, so the UI isn't poked while it is being destroyed
+            Hints.Deactivate();              // cancels any solve still running
         }
 
         /// <summary>A move made by the player: it is recorded so it can be undone.</summary>
         public void Submit(Move move)
         {
+            // Training mode: refuse anything that doesn't follow the hint.
+            if (TrainingMode && !Hints.IsProgress(move))
+            {
+                MoveRejected?.Invoke(move);
+                return;
+            }
+
             history.Push(move);
             Execute(move, 1f);
             Hints.NotifyMove(move, State);
@@ -114,8 +130,40 @@ namespace Rubikos.Game
 
         public void ToggleHints()
         {
-            if (Hints.IsActive) Hints.Deactivate();
-            else _ = Hints.Activate(State);
+            if (Hints.IsActive)
+            {
+                TrainingMode = false; // training needs hints
+                Hints.Deactivate();
+            }
+            else
+            {
+                _ = Hints.Activate(State);
+            }
+            Changed?.Invoke();
+        }
+
+        public void ToggleTraining()
+        {
+            TrainingMode = !TrainingMode;
+            if (TrainingMode && !Hints.IsActive) _ = Hints.Activate(State);
+            Changed?.Invoke();
+        }
+
+        /// <summary>Lets the computer make the next suggested move.</summary>
+        public void PlayNextHint()
+        {
+            if (Hints.Status != HintStatus.Ready) return;
+            Submit(Hints.Remaining[0]);
+        }
+
+        /// <summary>Lets the computer make every remaining suggested move, one after another.</summary>
+        public void PlayAllHints()
+        {
+            if (Hints.Status != HintStatus.Ready) return;
+
+            // Work on a copy: the hint list shrinks while we submit.
+            foreach (Move move in new List<Move>(Hints.Remaining))
+                Submit(move);
         }
 
         // The one place where a move really happens: model first, then animation.
@@ -125,6 +173,8 @@ namespace Rubikos.Game
             MoveSubmitted?.Invoke(move);
             moveQueue.Enqueue(move, speed);
         }
+
+        private void OnHintsChanged() => Changed?.Invoke();
 
         private void OnQueueIdle()
         {

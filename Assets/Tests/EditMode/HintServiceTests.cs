@@ -159,6 +159,61 @@ namespace Rubikos.Tests
         }
 
         [Test]
+        public void IsProgress_TheExactHintedMove_IsTrue()
+        {
+            var (_, hints) = Create("R U");
+            hints.Activate(new CubeState());
+
+            Assert.IsTrue(hints.IsProgress(OneMove("R")));
+        }
+
+        [Test]
+        public void IsProgress_TheOppositeQuarterTurn_IsFalse()
+        {
+            var (_, hints) = Create("R U");
+            hints.Activate(new CubeState());
+
+            Assert.IsFalse(hints.IsProgress(OneMove("R'")));
+        }
+
+        [Test]
+        public void IsProgress_AHalfTurnWhenAQuarterIsHinted_IsFalse()
+        {
+            var (_, hints) = Create("R U");
+            hints.Activate(new CubeState());
+
+            Assert.IsFalse(hints.IsProgress(OneMove("R2")));
+        }
+
+        [TestCase("R")]
+        [TestCase("R'")]
+        [TestCase("R2")]
+        public void IsProgress_AnyTurnOfTheRightLayer_IsTrueWhenAHalfTurnIsHinted(string played)
+        {
+            var (_, hints) = Create("R2 U");
+            hints.Activate(new CubeState());
+
+            Assert.IsTrue(hints.IsProgress(OneMove(played)));
+        }
+
+        [Test]
+        public void IsProgress_ADifferentLayer_IsFalse()
+        {
+            var (_, hints) = Create("R U");
+            hints.Activate(new CubeState());
+
+            Assert.IsFalse(hints.IsProgress(OneMove("U")));
+        }
+
+        [Test]
+        public void IsProgress_WhenHintsAreOff_IsAlwaysTrue()
+        {
+            var (_, hints) = Create("R U");
+
+            Assert.IsTrue(hints.IsProgress(OneMove("F")));
+        }
+
+        [Test]
         public void OutdatedAnswers_AreIgnored()
         {
             // Unity's editor has a "synchronization context" that would delay continuations to the next frame.

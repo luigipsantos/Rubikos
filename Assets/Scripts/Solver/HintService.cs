@@ -81,6 +81,30 @@ namespace Rubikos.Solver
             return true;
         }
 
+        /// <summary>
+        /// Would this move bring the player closer to the solution?
+        /// Training mode uses it to accept only helpful moves. When there is no hint to follow, every move is fine.
+        /// </summary>
+        public bool IsProgress(Move move)
+        {
+            if (Status != HintStatus.Ready) return true;
+
+            Move next = remaining[0];
+            if (next.Axis != move.Axis || next.Layer != move.Layer) return false;
+
+            int left = Normalize(next.Turns - move.Turns);
+            return Cost(left) < Cost(next.Turns);
+        }
+
+        private static int Normalize(int turns) => ((turns % 4) + 4) % 4; // always 0, 1, 2 or 3
+
+        // Quarter turns still needed: 0 (done), 1 (one quarter turn either way) or 2 (a half turn).
+        private static int Cost(int turns)
+        {
+            int t = Normalize(turns);
+            return t == 0 ? 0 : t == 2 ? 2 : 1;
+        }
+
         private async Task RequestAsync(CubeState state)
         {
             CancelRequest();
