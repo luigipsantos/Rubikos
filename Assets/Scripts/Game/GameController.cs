@@ -9,11 +9,13 @@ using UnityEngine;
 namespace Rubikos.Game
 {
     /// <summary>
-    /// The conductor. Owns the rules model, the move history and the hint system.
+    /// The conductor. Owns the rules model, the move history, the hint system and the timed-solve session.
     /// Model first: the state changes immediately, and the queue animates it afterwards.
     /// </summary>
     public class GameController : MonoBehaviour
     {
+        private const string BestTimeKey = "Rubikos.BestSeconds";
+
         [SerializeField] private CubeView cubeView;
         [SerializeField] private MoveQueue moveQueue;
 
@@ -34,6 +36,17 @@ namespace Rubikos.Game
         /// <summary>In training mode only the suggested move is accepted.</summary>
         public bool TrainingMode { get; private set; }
 
+        // ---- timed solve session ----
+        public SolveTimer Timer { get; } = new SolveTimer();
+
+        /// <summary>Best time in seconds without hints. 0 means no record yet.</summary>
+        public double BestSeconds { get; private set; }
+
+        /// <summary>True if hints or training were switched on at any point since the last scramble.</summary>
+        public bool HintsUsedThisRun { get; private set; }
+
+        public bool LastSolveWasRecord { get; private set; }
+
         public bool IsBusy => moveQueue.IsBusy;
         public int MoveCount => history.Count;
         public bool CanUndo => history.Count > 0;
@@ -44,8 +57,13 @@ namespace Rubikos.Game
         /// <summary>Raised when training mode refuses a move.</summary>
         public event Action<Move> MoveRejected;
 
+        /// <summary>Raised when the player finishes a timed solve (after the last animation).</summary>
+        public event Action Solved;
+
         /// <summary>Raised when something the UI shows may have changed (including hint changes).</summary>
         public event Action Changed;
+
+        private static double Now => Time.realtimeSinceStartupAsDouble;
 
         private void Awake()
         {
@@ -56,6 +74,8 @@ namespace Rubikos.Game
             solver = new KociembaSolver(tableFolder);
             Hints = new HintService(solver);
             Hints.Changed += OnHintsChanged; // forward, so UI scripts only need to listen to our Changed
+
+            BestSeconds = PlayerPrefs.GetFloat(BestTimeKey, 0f);
         }
 
         private void Start()
@@ -69,8 +89,8 @@ namespace Rubikos.Game
         private void OnDestroy()
         {
             if (Hints == null) return;
-            Hints.Changed -= OnHintsChanged; // unsubscribe first, so the UI isn't poked while it is being destroyed
-            Hints.Deactivate();              // cancels any solve still running
+            Hints.Changed -= OnHintsChanged;
+            Hints.Deactivate(); // cancels any solve still running
         }
 
         /// <summary>A move made by the player: it is recorded so it can be undone.</summary>
@@ -85,6 +105,7 @@ namespace Rubikos.Game
 
             history.Push(move);
             Execute(move, 1f);
+            Timer.NotifyMove(Now);
             Hints.NotifyMove(move, State);
             Changed?.Invoke();
         }
@@ -104,12 +125,16 @@ namespace Rubikos.Game
             Changed?.Invoke();
         }
 
-        /// <summary>Mixes the cube from its current state. The scramble is not undoable and not counted.</summary>
+        /// <summary>Mixes the cube from its current state and arms the timer. The scramble is not undoable and not counted.</summary>
         public void Scramble()
         {
             history.Clear();
             foreach (Move move in Scrambler.Generate(scrambleLength))
                 Execute(move, scrambleSpeed);
+
+            Timer.Arm();
+            HintsUsedThisRun = Hints.IsActive;
+            LastSolveWasRecord = false;
 
             Hints.Refresh(State); // one request for the whole scramble, not one per move
             Changed?.Invoke();
@@ -118,11 +143,14 @@ namespace Rubikos.Game
         /// <summary>Instantly returns to the solved cube, even in the middle of an animation.</summary>
         public void ResetCube()
         {
-            moveQueue.Cancel();       // 1. stop animating
-            cubeView.ResetToSolved(); // 2. snap the 3D cubies home
-            State.Reset();            // 3. reset the model
-            history.Clear();          // 4. forget the history
-            Hints.Refresh(State);     // 5. hints (if on) start over
+            moveQueue.Cancel();       // Stop animating
+            cubeView.ResetToSolved(); // Snap the 3D cubies home
+            State.Reset();            // Reset the model
+            history.Clear();          // Forget the history
+            Timer.Reset();            // No timed solve any more
+            HintsUsedThisRun = false;
+            LastSolveWasRecord = false;
+            Hints.Refresh(State);     // Hints (if on) start over
 
             VerifyView();
             Changed?.Invoke();
@@ -137,6 +165,7 @@ namespace Rubikos.Game
             }
             else
             {
+                HintsUsedThisRun = true;
                 _ = Hints.Activate(State);
             }
             Changed?.Invoke();
@@ -145,7 +174,11 @@ namespace Rubikos.Game
         public void ToggleTraining()
         {
             TrainingMode = !TrainingMode;
-            if (TrainingMode && !Hints.IsActive) _ = Hints.Activate(State);
+            if (TrainingMode)
+            {
+                HintsUsedThisRun = true;
+                if (!Hints.IsActive) _ = Hints.Activate(State);
+            }
             Changed?.Invoke();
         }
 
@@ -179,7 +212,29 @@ namespace Rubikos.Game
         private void OnQueueIdle()
         {
             VerifyView();
+
+            // Solved while the clock was running: the cube can only be solved at the end of a timed run,
+            // because Undo never goes further back than the (unsolved) scramble.
+            if (Timer.State == SolveTimerState.Running && State.IsSolved)
+                FinishSolve();
+
             Changed?.Invoke();
+        }
+
+        private void FinishSolve()
+        {
+            Timer.Stop(Now);
+            double seconds = Timer.ElapsedSeconds(Now); // after Stop: the frozen final time
+
+            LastSolveWasRecord = !HintsUsedThisRun && (BestSeconds <= 0 || seconds < BestSeconds);
+            if (LastSolveWasRecord)
+            {
+                BestSeconds = seconds;
+                PlayerPrefs.SetFloat(BestTimeKey, (float)seconds);
+                PlayerPrefs.Save();
+            }
+
+            Solved?.Invoke();
         }
 
         private void VerifyView()

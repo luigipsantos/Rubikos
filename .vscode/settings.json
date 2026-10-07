@@ -67,5 +67,6 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Rubikos.slnx"
+    "dotnet.defaultSolution": "Rubikos.slnx",
+    "git.ignoreLimitWarning": true
 }

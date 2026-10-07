@@ -8,6 +8,7 @@ namespace Rubikos.Controls
     /// <summary>
     /// Keyboard controls. Direct mode: U D L R F B M E S (Shift = counter-clockwise).
     /// Selector mode: 1/2/3 pick an axis, Up/Down pick a layer, Left/Right turn it.
+    /// Learning: H hints, T training, N do the next hint, P play all hints. Backspace = undo.
     /// </summary>
     public class KeyboardController : MonoBehaviour
     {
@@ -20,8 +21,6 @@ namespace Rubikos.Controls
             (Key.M, 'M'), (Key.E, 'E'), (Key.S, 'S'),
         };
 
-        private GUIStyle helpStyle;
-
         private void Update()
         {
             Keyboard kb = Keyboard.current;
@@ -31,7 +30,6 @@ namespace Rubikos.Controls
             if (kb.ctrlKey.isPressed || kb.altKey.isPressed) return;
 
             if (kb.backspaceKey.wasPressedThisFrame) game.Undo();
-
             if (kb.hKey.wasPressedThisFrame) game.ToggleHints();
             if (kb.tKey.wasPressedThisFrame) game.ToggleTraining();
             if (kb.nKey.wasPressedThisFrame) game.PlayNextHint();
@@ -65,26 +63,6 @@ namespace Rubikos.Controls
 
             if (kb.rightArrowKey.wasPressedThisFrame) game.Submit(new Move(selector.Axis, selector.Layer, 1));
             if (kb.leftArrowKey.wasPressedThisFrame)  game.Submit(new Move(selector.Axis, selector.Layer, -1));
-        }
-
-        // Temporary help text (a real UI comes in P7).
-        private void OnGUI()
-        {
-            helpStyle ??= new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 16,
-                normal = { textColor = Color.white }
-            };
-
-            GUI.Label(new Rect(12, 10, 1000, 170),
-                "Faces: U D L R F B M E S   (Shift = counter-clockwise)\n" +
-                "Select: 1 = column, 2 = row, 3 = slice   Up/Down = pick layer   Esc = clear\n" +
-                "Turn selected layer: Right / Left arrow     Undo: Backspace\n" +
-                "Hints: H   Training: T   Do next hint: N   Play all hints: P\n" +
-                "Mouse: left drag on a face = turn that layer, left click = select layer (click again = next axis)\n" +
-                "Camera: right mouse drag = orbit, wheel = zoom\n" +
-                "Selected: " + selector.Describe(),
-                helpStyle);
         }
     }
 }
