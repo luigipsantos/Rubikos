@@ -12,6 +12,7 @@ namespace Rubikos.View
     public class CubeView : MonoBehaviour
     {
         private CubieView[] cubies;
+        private Vector3Int[] homeCoords;   // where each cubie sits when the cube is solved
         private Transform pivot;
 
         private void Awake()
@@ -19,6 +20,11 @@ namespace Rubikos.View
             cubies = GetComponentsInChildren<CubieView>();
             if (cubies.Length != 26)
                 Debug.LogError($"CubeView expected 26 cubies but found {cubies.Length}. Rebuild the cube.", this);
+
+            // The scene starts solved, so what we read now IS the solved layout.
+            homeCoords = new Vector3Int[cubies.Length];
+            for (int i = 0; i < cubies.Length; i++)
+                homeCoords[i] = cubies[i].Coord;
 
             // The pivot is an invisible helper object at the center of the cube.
             pivot = new GameObject("Pivot").transform;
@@ -58,6 +64,21 @@ namespace Rubikos.View
                 cubie.CommitTurn(move);
             }
             pivot.localRotation = Quaternion.identity;
+        }
+
+        /// <summary>
+        /// Instantly puts every cubie back to the solved layout.
+        /// Safe to call in the middle of an animation: cubies hanging on the pivot are given back first.
+        /// </summary>
+        public void ResetToSolved()
+        {
+            pivot.localRotation = Quaternion.identity;
+
+            for (int i = 0; i < cubies.Length; i++)
+            {
+                cubies[i].transform.SetParent(transform, true);
+                cubies[i].ResetTo(homeCoords[i]);
+            }
         }
 
         /// <summary>

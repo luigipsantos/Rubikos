@@ -40,6 +40,14 @@ namespace Rubikos.View
             transform.localRotation = SnapToRightAngle(transform.localRotation);
         }
 
+        /// <summary>Puts this cubie back at a solved-cube position, facing its original way (used by Reset).</summary>
+        public void ResetTo(Vector3Int gridCoord)
+        {
+            coord = gridCoord;
+            transform.localPosition = (Vector3)gridCoord;
+            transform.localRotation = Quaternion.identity;
+        }
+
         /// <summary>Rounds a rotation so its axes point exactly along X, Y or Z.</summary>
         private static Quaternion SnapToRightAngle(Quaternion rotation)
         {

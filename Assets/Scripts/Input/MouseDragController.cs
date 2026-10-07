@@ -3,6 +3,7 @@ using Rubikos.Game;
 using Rubikos.View;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 namespace Rubikos.Controls
 {
@@ -61,6 +62,10 @@ namespace Rubikos.Controls
         private void BeginPress(Vector2 position)
         {
             state = PressState.Idle;
+
+            // Don't grab the cube when the click is really on a UI button.
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
             if (game.IsBusy) return;
 
             if (Physics.Raycast(cam.ScreenPointToRay(position), out RaycastHit hit))
