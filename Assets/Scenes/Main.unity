@@ -1730,6 +1730,7 @@ GameObject:
   - component: {fileID: 2122090520}
   - component: {fileID: 2122090519}
   - component: {fileID: 2122090521}
+  - component: {fileID: 2122090522}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -1825,6 +1826,20 @@ MonoBehaviour:
   selector: {fileID: 2122090520}
   cam: {fileID: 330585545}
   dragThresholdPixels: 15
+--- !u!114 &2122090522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122090514}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 759b97c096307794991aa7b4e164a86f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Rubikos.UI.HintDebugView
+  game: {fileID: 2122090517}
+  maxMovesShown: 12
 --- !u!1001 &3758306780273798737
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -32,6 +32,8 @@ namespace Rubikos.Controls
 
             if (kb.backspaceKey.wasPressedThisFrame) game.Undo();
 
+            if (kb.hKey.wasPressedThisFrame) game.ToggleHints();
+
             HandleNotationKeys(kb);
             HandleSelectorKeys(kb);
         }
@@ -74,7 +76,7 @@ namespace Rubikos.Controls
             GUI.Label(new Rect(12, 10, 900, 140),
                 "Faces: U D L R F B M E S   (Shift = counter-clockwise)\n" +
                 "Select: 1 = column, 2 = row, 3 = slice   Up/Down = pick layer   Esc = clear\n" +
-                "Turn selected layer: Right / Left arrow     Undo: Backspace\n" +
+                "Turn selected layer: Right / Left arrow     Undo: Backspace     Hints: H\n" +
                 "Mouse: left drag on a face = turn that layer, left click = select layer (click again = next axis)\n" +
                 "Camera: right mouse drag = orbit, wheel = zoom\n" +
                 "Selected: " + selector.Describe(),

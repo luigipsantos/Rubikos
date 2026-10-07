@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Rubikos.Core;
+using Rubikos.Solver;
 using Rubikos.View;
 using UnityEngine;
 
 namespace Rubikos.Game
 {
     /// <summary>
-    /// The conductor. Owns the rules model and the move history.
+    /// The conductor. Owns the rules model, the move history and the hint system.
     /// Model first: the state changes immediately, and the queue animates it afterwards.
     /// </summary>
     public class GameController : MonoBehaviour
@@ -22,7 +24,13 @@ namespace Rubikos.Game
         // The player's moves, newest on top. Undo pops from here.
         private readonly Stack<Move> history = new Stack<Move>();
 
+        private ISolver solver;
+
         public CubeState State { get; } = new CubeState();
+        public HintService Hints { get; private set; }
+        public SolverStatus SolverStatus => solver.Status;
+        public string SolverMessage => solver.StatusMessage;
+
         public bool IsBusy => moveQueue.IsBusy;
         public int MoveCount => history.Count;
         public bool CanUndo => history.Count > 0;
@@ -33,14 +41,35 @@ namespace Rubikos.Game
         /// <summary>Raised when something the UI shows may have changed.</summary>
         public event Action Changed;
 
+        private void Awake()
+        {
+            // The solver's lookup tables live outside the project, so they are never committed to Git.
+            string tableFolder = Path.Combine(Application.persistentDataPath, "KociembaTables");
+            Debug.Log("Solver tables folder: " + tableFolder);
+
+            solver = new KociembaSolver(tableFolder);
+            Hints = new HintService(solver);
+        }
+
+        private void Start()
+        {
+            _ = solver.PrepareAsync(); // runs in the background: the game stays responsive
+        }
+
         private void OnEnable()  { moveQueue.BecameIdle += OnQueueIdle; }
         private void OnDisable() { moveQueue.BecameIdle -= OnQueueIdle; } // always unsubscribe!
+
+        private void OnDestroy()
+        {
+            Hints?.Deactivate(); // cancels any solve still running
+        }
 
         /// <summary>A move made by the player: it is recorded so it can be undone.</summary>
         public void Submit(Move move)
         {
             history.Push(move);
             Execute(move, 1f);
+            Hints.NotifyMove(move, State);
             Changed?.Invoke();
         }
 
@@ -53,8 +82,9 @@ namespace Rubikos.Game
         {
             if (history.Count == 0) return;
 
-            Move last = history.Pop();
-            Execute(last.Inverse, 1f);
+            Move inverse = history.Pop().Inverse;
+            Execute(inverse, 1f);
+            Hints.NotifyMove(inverse, State);
             Changed?.Invoke();
         }
 
@@ -64,6 +94,8 @@ namespace Rubikos.Game
             history.Clear();
             foreach (Move move in Scrambler.Generate(scrambleLength))
                 Execute(move, scrambleSpeed);
+
+            Hints.Refresh(State); // one request for the whole scramble, not one per move
             Changed?.Invoke();
         }
 
@@ -74,9 +106,16 @@ namespace Rubikos.Game
             cubeView.ResetToSolved(); // 2. snap the 3D cubies home
             State.Reset();            // 3. reset the model
             history.Clear();          // 4. forget the history
+            Hints.Refresh(State);     // 5. hints (if on) start over
 
             VerifyView();
             Changed?.Invoke();
+        }
+
+        public void ToggleHints()
+        {
+            if (Hints.IsActive) Hints.Deactivate();
+            else _ = Hints.Activate(State);
         }
 
         // The one place where a move really happens: model first, then animation.
